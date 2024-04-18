@@ -8,9 +8,10 @@ import { RecordsModule } from './records/records.module';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './logger/all-exceptions.filter';
 import { LoggerModule } from './logger/logger.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, AccountsModule, RecordsModule, LoggerModule],
+  imports: [AuthModule, UsersModule, AccountsModule, RecordsModule, LoggerModule, DatabaseModule],
   controllers: [AppController],
   providers: [
     AppService, 

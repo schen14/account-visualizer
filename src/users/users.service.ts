@@ -2,32 +2,49 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { MyLogger } from 'src/logger/logger.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Prisma } from '@prisma/client';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly logger: MyLogger) {
+  constructor(private readonly logger: MyLogger, private readonly databaseService: DatabaseService) {
     this.logger.setContext(UsersService.name)
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: Prisma.UserCreateInput) {
+    return this.databaseService.user.create({
+      data: createUserDto
+    })
   }
 
-  findAll() {
-    this.logger.log('service here')
-    //return `This action returns all users`;
-    throw new NotFoundException('user not found')
+  async findAll() {
+    return this.databaseService.user.findMany({
+      where: {}
+    })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    return this.databaseService.user.findUnique({
+      where: {
+        id,
+      }
+    })
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: Prisma.UserUpdateInput) {
+    return this.databaseService.user.update({
+      where: {
+        id,
+      },
+      data: updateUserDto
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    return this.databaseService.user.delete({
+      where: {
+        id,
+      }
+    })
   }
 }
