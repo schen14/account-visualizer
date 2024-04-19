@@ -41,6 +41,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
                 .json(errorResponse)
         
         this.logger.error(errorResponse.response, exception.stack);
+        this.logger.logHttp(request, response)
     }
 
     private getErrorResponse = (

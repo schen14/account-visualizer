@@ -5,10 +5,11 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { RecordsModule } from './records/records.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './logger/all-exceptions.filter';
 import { LoggerModule } from './logger/logger.module';
 import { DatabaseModule } from './database/database.module';
+import { LoggingInterceptor } from './logger/logger.interceptor';
 
 @Module({
   imports: [AuthModule, UsersModule, AccountsModule, RecordsModule, LoggerModule, DatabaseModule],
@@ -19,6 +20,10 @@ import { DatabaseModule } from './database/database.module';
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor
     }
   ],
 })

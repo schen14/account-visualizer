@@ -1,6 +1,7 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { HttpStatus, Injectable, Scope } from '@nestjs/common';
 import { WinstonLogger } from 'nest-winston';
 import { instance as logger } from './winston.config'
+import { Request, Response } from 'express';
 
 /*
 Notes:
@@ -22,5 +23,14 @@ ex: this.logger.log(msg, context) => this.logger.log(msg)
 export class MyLogger extends WinstonLogger {
     constructor() {
         super(logger)
-    }    
+    }
+
+    logHttp(req: Request, res: Response, startTimestamp?: number) {
+        const CONTEXT = 'HTTP'
+        const { method, url } = req; 
+        const { statusCode } = res;
+        const statusName = HttpStatus[statusCode]
+        const time = startTimestamp ? ` ${Date.now() - startTimestamp}ms` : ''
+        this.log(`${method} ${url} - ${statusCode} ${statusName}${time}`, CONTEXT)
+    }
   }
