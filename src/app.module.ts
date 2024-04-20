@@ -10,9 +10,20 @@ import { AllExceptionsFilter } from './logger/all-exceptions.filter';
 import { LoggerModule } from './logger/logger.module';
 import { DatabaseModule } from './database/database.module';
 import { LoggingInterceptor } from './logger/logger.interceptor';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [AuthModule, UsersModule, AccountsModule, RecordsModule, LoggerModule, DatabaseModule],
+  imports: [
+    AuthModule, 
+    UsersModule, 
+    AccountsModule, 
+    RecordsModule, 
+    LoggerModule, 
+    DatabaseModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
   controllers: [AppController],
   providers: [
     AppService, 

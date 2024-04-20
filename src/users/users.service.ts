@@ -18,6 +18,7 @@ export class UsersService {
   }
 
   async findAll() {
+    this.logger.log('service here')
     return this.databaseService.user.findMany({
       where: {}
     })

@@ -4,12 +4,16 @@ import * as argon from 'argon2';
 import { DatabaseService } from 'src/database/database.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { MyLogger } from 'src/logger/logger.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly logger: MyLogger,
+    private readonly jwt: JwtService,
+    private readonly config: ConfigService,
   ) {
     this.logger.setContext(AuthService.name)
   }
@@ -24,7 +28,7 @@ export class AuthService {
         data: registerDto
       })
 
-      return 'done'
+      return this.signToken(user.id, user.email)
     } catch(error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -51,6 +55,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password')
     }
 
-    return 'logged in'
+    return this.signToken(user.id, user.email)
+  }
+
+  async signToken(userId: number, email: string): Promise<{access_token: string}> {
+    const payload = {
+      sub: userId,
+      email
+    }
+
+    const token= await this.jwt.signAsync(payload, {
+      expiresIn: '15m',
+      secret: this.config.get('JWT_SECRET')
+    })
+
+    return { access_token: token }
   }
 }
