@@ -28,9 +28,15 @@ export class MyLogger extends WinstonLogger {
     logHttp(req: Request, res: Response, startTimestamp?: number) {
         const CONTEXT = 'HTTP'
         const { method, url, body } = req; 
+        const jsonBody = method === 'GET' ? null : JSON.stringify(body)
         const { statusCode } = res;
         const statusName = HttpStatus[statusCode]
-        const delay = startTimestamp ? ` ${Date.now() - startTimestamp}ms` : ''
-        this.log(`${method} ${url} - ${JSON.stringify(body)} - ${statusCode} ${statusName}${delay}`, CONTEXT)
+        const delay = startTimestamp ? ` ${Date.now() - startTimestamp}ms` : null
+        
+        this.log([`${method} ${url}`, jsonBody, `${statusCode} ${statusName}`, delay]
+                    .filter(c => (c))
+                    .join(' : '), 
+                CONTEXT)
+        
     }
   }

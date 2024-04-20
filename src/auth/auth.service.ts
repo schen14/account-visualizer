@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
+import * as argon from 'argon2';
+import { DatabaseService } from 'src/database/database.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { MyLogger } from 'src/logger/logger.service';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly logger: MyLogger,
+  ) {
+    this.logger.setContext(AuthService.name)
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async register(registerDto: RegisterDto) {
+    await argon
+            .hash(registerDto.password)
+            .then(pwd => {registerDto.password = pwd;})
+
+    try {
+      const user = await this.databaseService.user.create({
+        data: registerDto
+      })
+
+      return 'done'
+    } catch(error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ConflictException('Invalid email')
+        }
+      }
+      throw error
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+  async login(loginDto: LoginDto) {
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        email: loginDto.email
+      }
+    })
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password')
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const pwMatches = await argon.verify(user.password, loginDto.password)
+    if (!pwMatches) {
+      throw new UnauthorizedException('Invalid email or password')
+    }
+
+    return 'logged in'
   }
 }

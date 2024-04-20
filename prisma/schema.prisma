@@ -16,12 +16,14 @@ datasource db {
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
-  hash      String
+  password  String
   firstName String
   lastName  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   accounts  Account[]
+
+  // @@map("users")
 }
 
 model Account {
@@ -29,7 +31,6 @@ model Account {
   user        User      @relation(fields: [userId], references: [id])
   userId      Int
   name        String
-  value       Decimal?
   accountType AccountType
   note        String?
   iconPath    String?
@@ -44,6 +45,7 @@ enum AccountType {
   RETIREMENT
   BROKERAGE
   LIABILITY
+  OTHER
 }
 
 model Record {
@@ -54,5 +56,5 @@ model Record {
   createdAt DateTime  @default(now())
   createdBy String?
   updatedAt DateTime  @updatedAt
-  updatedBy String
+  updatedBy String?
 }

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 // import { CustomHttpExceptionResponse, HttpExceptionResponse } from "./models/http-exception-interface";
 import { BaseExceptionFilter, HttpAdapterHost } from "@nestjs/core";
 import { MyLogger } from "./logger.service";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 
 type CustomResponseObj = {
     statusCode: number,
@@ -30,7 +31,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         if (exception instanceof HttpException) {
             status = exception.getStatus();
             errorMessage = exception.getResponse();
-        } else {
+        } else if (exception instanceof PrismaClientValidationError) {
+            status = HttpStatus.UNPROCESSABLE_ENTITY
+            errorMessage = exception.message.replaceAll(/\n/g, '')
+        }
+        else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             errorMessage = 'Internal Server Error'
         }
