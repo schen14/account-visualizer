@@ -2,8 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
-import { JwtGuard } from 'src/auth/guard';
-import { GetUser } from 'src/auth/decorator';
+import { JwtGuard } from '../auth/guard';
+import { GetUser } from '../auth/decorator';
 import { User } from '@prisma/client';
 
 @UseGuards(JwtGuard)

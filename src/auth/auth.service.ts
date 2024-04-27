@@ -1,9 +1,9 @@
 import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import * as argon from 'argon2';
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from '../database/database.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { MyLogger } from 'src/logger/logger.service';
+import { MyLogger } from '../logger/logger.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
