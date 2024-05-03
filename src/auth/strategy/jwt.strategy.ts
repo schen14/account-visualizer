@@ -10,7 +10,7 @@ type Payload = {
 }
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {  // 'jwt' will link this strategy to AuthGuards using 'jwt' in passport
     constructor(
         config: ConfigService, 
         private database: DatabaseService) {

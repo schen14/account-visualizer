@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, HttpStatus, HttpCode } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
@@ -11,28 +11,29 @@ import { User } from '@prisma/client';
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
-  @Post()
-  create(@Body() createAccountDto: CreateAccountDto, @GetUser() user: User) {
-    return this.accountsService.create(createAccountDto);
-  }
-
   @Get()
-  findAll() {
-    return this.accountsService.findAll();
+  findAll(@GetUser('id') userId: number) {
+    return this.accountsService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.accountsService.findOne(+id);
+  findOne(@GetUser('id') userId: number, @Param('id', ParseIntPipe) accountId: number) {
+    return this.accountsService.findOne(userId, accountId);
+  }
+  
+  @Post()
+  create(@GetUser('id') userId: number, @Body() createAccountDto: CreateAccountDto) {
+    return this.accountsService.create(userId, createAccountDto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
-    return this.accountsService.update(+id, updateAccountDto);
+  update(@GetUser('id') userId: number, @Param('id', ParseIntPipe) accountId: number, @Body() updateAccountDto: UpdateAccountDto) {
+    return this.accountsService.update(userId, accountId, updateAccountDto);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.accountsService.remove(+id);
+  remove(@GetUser('id') userId: number, @Param('id', ParseIntPipe) accountId: number) {
+    return this.accountsService.remove(userId, accountId);
   }
 }
