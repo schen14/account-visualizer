@@ -53,7 +53,6 @@ export class AccountsService {
         ...updateAccountDto
       }
     });
-
   }
 
   async remove(userId: number, accountId: number) {

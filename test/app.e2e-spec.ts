@@ -6,6 +6,7 @@ import * as pactum from 'pactum';
 import { LoginDto, RegisterDto } from '../src/auth/dto';
 import { AccountType, Prisma } from '@prisma/client';
 import { CreateAccountDto, UpdateAccountDto } from '../src/accounts/dto';
+import { CreateRecordDto, UpdateRecordDto } from '../src/records/dto';
 
 describe('App e2e', () => {
   let app: INestApplication;
@@ -152,8 +153,14 @@ describe('App e2e', () => {
       const dto: CreateAccountDto = {
         "name": "Test Checking Account",
         "accountType": AccountType.CHECKING,
-        "note": "test",
+        "note": "test 1",
       }
+      const dto2: CreateAccountDto = {
+        "name": "Test Savings Account",
+        "accountType": AccountType.SAVINGS,
+        "note": "test 2",
+      }
+
       it('should create account', () => {
         return pactum.spec()
         .post('/accounts')
@@ -163,6 +170,17 @@ describe('App e2e', () => {
         .withBody(dto)
         .expectStatus(HttpStatus.CREATED)
         .stores('accountId', 'id')
+      })
+
+      it('should create another account', () => {
+        return pactum.spec()
+        .post('/accounts')
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .withBody(dto2)
+        .expectStatus(HttpStatus.CREATED)
+        .stores('accountId2', 'id')
       })
     });
 
@@ -174,7 +192,7 @@ describe('App e2e', () => {
           Authorization: 'Bearer $S{userAt}',
         })
         .expectStatus(HttpStatus.OK)
-        .expectJsonLength(1)
+        .expectJsonLength(2)
       })
     });
 
@@ -212,34 +230,158 @@ describe('App e2e', () => {
       it('should delete account', () => {
         return pactum.spec()
         .delete('/accounts/{id}')
-        .withPathParams('id', '$S{accountId}')
+        .withPathParams('id', '$S{accountId2}')
         .withHeaders({
           Authorization: 'Bearer $S{userAt}',
         })
         .expectStatus(HttpStatus.NO_CONTENT)
       })
 
-      it('should get empty accounts', () => {
+      it('should get non-deleted accounts', () => {
         return pactum.spec()
         .get('/accounts')
         .withHeaders({
           Authorization: 'Bearer $S{userAt}',
         })
         .expectStatus(HttpStatus.OK)
-        .expectJsonLength(0)
+        .expectJsonLength(1)
       })
     });
   });
 
   describe('Record', () => {
-    describe('Create record', () => {});
+    describe('Get empty records', () => {
+      it('should get empty records', () => {
+        return pactum.spec()
+        .get('/accounts/{accountId}/records')
+        .withPathParams('accountId', '$S{accountId}')
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .expectStatus(HttpStatus.OK)
+        .expectBody([])
+      })
+    });
 
-    describe('Get records', () => {});
+    describe('Create record', () => {
+      const dto: CreateRecordDto = {
+        value: 999.99
+      }
+      const dto2: CreateRecordDto = {
+        value: 123.45
+      }
+      it('should create record', () => {
+        return pactum.spec()
+        .post('/accounts/{accountId}/records')
+        .withPathParams('accountId', '$S{accountId}')
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .withBody(dto)
+        .expectStatus(HttpStatus.CREATED)
+        .stores('recordId', 'id')
+      })
 
-    describe('Get record by id', () => {});
+      it('should create another record', () => {
+        return pactum.spec()
+        .post('/accounts/{accountId}/records')
+        .withPathParams('accountId', '$S{accountId}')
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .withBody(dto2)
+        .expectStatus(HttpStatus.CREATED)
+        .stores('recordId2', 'id')
+        .stores('value2', 'value')
+      })
+    });
 
-    describe('Update record by id', () => {});
+    describe('Get records', () => {
+      it('should get records', () => {
+        return pactum.spec()
+        .get('/accounts/{accountId}/records')
+        .withPathParams('accountId', '$S{accountId}')
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .expectStatus(HttpStatus.OK)
+        .expectJsonLength(2)
+      })
+    });
 
-    describe('Delete record by id', () => {});
+    describe('Get latest record', () => {
+      it('should get latest record', () => {
+        return pactum.spec()
+        .get('/accounts/{accountId}/records/latest')
+        .withPathParams('accountId', '$S{accountId}')
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .expectStatus(HttpStatus.OK)
+        .expectBodyContains('$S{value2}')
+      })
+    });
+
+    describe('Get record by id', () => {
+      it('should get record by id', () => {
+        return pactum.spec()
+        .get('/accounts/{accountId}/records/{recordId}')
+        .withPathParams({
+          'accountId': '$S{accountId}', 
+          'recordId': '$S{recordId}'
+        })
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .expectStatus(HttpStatus.OK)
+        .expectBodyContains('$S{accountId}')
+      })
+    });
+
+    describe('Update record by id', () => {
+      const dto: UpdateRecordDto = {
+        value: 6789.10
+      }
+      it('should update record', () => {
+        return pactum.spec()
+        .patch('/accounts/{accountId}/records/{recordId}')
+        .withPathParams({
+          'accountId': '$S{accountId}', 
+          'recordId': '$S{recordId2}'
+        })
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .withBody(dto)
+        .expectStatus(HttpStatus.OK)
+        .expectBodyContains(dto.value)
+      })
+    });
+
+    describe('Delete record by id', () => {
+      it('should delete record', () => {
+        return pactum.spec()
+        .delete('/accounts/{accountId}/records/{recordId}')
+        .withPathParams({
+          'accountId': '$S{accountId}', 
+          'recordId': '$S{recordId2}'
+        })
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .expectStatus(HttpStatus.NO_CONTENT)
+      })
+
+      it('should get updated latest record', () => {
+        return pactum.spec()
+        .get('/accounts/{accountId}/records/latest')
+        .withPathParams('accountId', '$S{accountId}')
+        .withHeaders({
+          Authorization: 'Bearer $S{userAt}',
+        })
+        .expectStatus(HttpStatus.OK)
+        .expectBodyContains('$S{recordId}')
+      })
+    });
   });
 });

@@ -1,4 +1,11 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateRecordDto } from './create-record.dto';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class UpdateRecordDto extends PartialType(CreateRecordDto) {}
+export class UpdateRecordDto {
+    @IsNumber({maxDecimalPlaces: 2})
+    @IsNotEmpty()
+    value: number
+
+    @IsString()
+    @IsOptional()
+    updatedBy?: string
+}
