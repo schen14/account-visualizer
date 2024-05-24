@@ -7,6 +7,6 @@ this custom decorator will do the necessary work for me
 export const GetUser = createParamDecorator(
     (data: string | undefined, ctx: ExecutionContext) => {
         const request: Express.Request = ctx.switchToHttp().getRequest();
-        return data ? request.user[data] : request.user;
+        return data ? (request.user as any)[data] : request.user;
     },
 );

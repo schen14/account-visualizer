@@ -1,3 +1,5 @@
+name: account-visualizer
+
 services:
   dev-db:
     image: postgres:16
