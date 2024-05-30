@@ -4,6 +4,8 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { API_URL } from "../constants.ts/api";
 
 import { env } from "~/env";
 
@@ -40,13 +42,63 @@ export const authOptions: NextAuthOptions = {
       user: {
         ...session.user,
         id: token.sub,
+        // make api access token part of the session to send to NestJS
+        api_access_token: token.api_access_token
       },
     }),
+    jwt: async ({ token, account }) => {
+      if (account) {
+        const res = await fetch(`${API_URL}/auth/verify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_token: account.access_token,
+            provider: account.provider
+          })
+        })
+        const apiJwt = await res.json()
+        console.log(apiJwt)
+        if (res.ok && apiJwt) {
+          token.api_access_token = apiJwt.access_token
+        }
+      }
+      
+      return token
+    }
   },
   providers: [
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
+    }),
+    CredentialsProvider({
+      id: "login",
+      name: "Credentials",
+      credentials: {
+        email: {
+          label: "Email",
+          type: "email",
+        },
+        password: {
+          label: "Password",
+          type: "password"
+        }
+      },
+      async authorize(credentials) {
+        const res = await fetch(`${API_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(credentials)
+        })
+
+        const jwtToken = await res.json()
+
+        if (res.ok && jwtToken) {
+          return jwtToken
+        }
+
+        return null
+      }
     }),
     /**
      * ...add more providers here.
@@ -58,6 +110,9 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  session: {
+    maxAge: 60 * 60
+  }
 };
 
 /**

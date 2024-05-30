@@ -16,8 +16,8 @@ async function bootstrap() {
   });
   // Not needed?
   // app.useLogger(new MyLogger())
-
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+  app.setGlobalPrefix('api');
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   await app.listen(PORT);
 }
 bootstrap();

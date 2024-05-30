@@ -9,7 +9,7 @@ type CustomResponseObj = {
     statusCode: number,
     timeStamp: string,
     path: string,
-    response: string | object,
+    response: string,
     method: string,
 }
 
@@ -55,7 +55,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         request: Request,
     ): CustomResponseObj => ({
         statusCode: status,
-        response: errorMessage,
+        response: typeof errorMessage === 'string' ? errorMessage : (errorMessage as any).message,
         method: request.method,
         path: request.url,
         timeStamp: new Date().toISOString(),

@@ -15,15 +15,25 @@ datasource db {
 
 model User {
   id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  firstName String
-  lastName  String
+  email     String?
+  password  String?
+  firstName String?
+  lastName  String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   accounts  Account[]
+  thirdPartyUsers ThirdPartyUser[]
 
   // @@map("users")
+}
+
+model ThirdPartyUser {
+  externalId  String
+  provider    String
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+
+  @@id(name: "thirdPartyUserId", [externalId, provider])
 }
 
 model Account {

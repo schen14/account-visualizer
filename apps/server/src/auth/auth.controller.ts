@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dto';
+import { LoginDto, RegisterDto, VerifyDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,5 +16,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('verify')
+  verifyThirdPartyToken(@Body() verifyDto: VerifyDto) {
+    return this. authService.verifyThirdPartyToken(verifyDto)
   }
 }

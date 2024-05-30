@@ -1,11 +1,12 @@
 import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { LoginDto, RegisterDto, VerifyDto } from './dto/auth.dto';
 import * as argon from 'argon2';
 import { DatabaseService } from '../database/database.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { MyLogger } from '../logger/logger.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { providerURLs } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -40,13 +41,13 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.databaseService.user.findUnique({
+    const user = await this.databaseService.user.findFirst({
       where: {
         email: loginDto.email
       }
     })
 
-    if (!user) {
+    if (!user || !user.password) {
       throw new UnauthorizedException('Invalid email or password')
     }
 
@@ -58,17 +59,57 @@ export class AuthService {
     return this.signToken(user.id, user.email)
   }
 
-  async signToken(userId: number, email: string): Promise<{access_token: string}> {
+  async signToken(userId: number, email: string | null): Promise<{access_token: string}> {
     const payload = {
       sub: userId,
-      email
+      ...(email && { email })
     }
 
-    const token= await this.jwt.signAsync(payload, {
+    const token = await this.jwt.signAsync(payload, {
       expiresIn: '60m',
       secret: this.config.get('JWT_SECRET')
     })
 
     return { access_token: token }
+  }
+
+  async verifyThirdPartyToken(verifyDto: VerifyDto) {
+    const provider = verifyDto.provider
+
+    const res = await fetch(providerURLs[provider], {
+      method: "GET",
+      headers: { "Authorization": `Bearer ${verifyDto.access_token}` },
+    })
+
+    if (!res.ok) {
+      throw new UnauthorizedException("Invalid access token or provider")
+    }
+
+    const resJson = await res.json()
+    const externalId = resJson.id
+    let thirdPartyUser = await this.databaseService.thirdPartyUser.findUnique({
+      where: {
+        thirdPartyUserId: {
+          externalId: externalId,
+          provider: verifyDto.provider
+        }
+      }
+    })
+
+    // First time third party sign in should create user data
+    if (!thirdPartyUser) {
+      const newUser = await this.databaseService.user.create({
+        data: {}
+      })
+      thirdPartyUser = await this.databaseService.thirdPartyUser.create({
+        data: {
+          externalId: externalId,
+          provider: verifyDto.provider,
+          userId: newUser.id
+        }
+      })
+    } 
+
+    return this.signToken(thirdPartyUser.userId, null)
   }
 }

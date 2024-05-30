@@ -19,3 +19,13 @@ export class RegisterDto extends LoginDto{
     @IsNotEmpty()
     lastName: string;
 }
+
+export class VerifyDto {
+    @IsString()
+    @IsNotEmpty()
+    access_token: string;
+
+    @IsString()
+    @IsNotEmpty()
+    provider: string;
+}
