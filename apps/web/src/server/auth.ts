@@ -5,7 +5,6 @@ import {
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { API_URL } from "../constants.ts/api";
 
 import { env } from "~/env";
 
@@ -48,7 +47,7 @@ export const authOptions: NextAuthOptions = {
     }),
     jwt: async ({ token, account }) => {
       if (account) {
-        const res = await fetch(`${API_URL}/auth/verify`, {
+        const res = await fetch(`${env.API_URL}/auth/verify`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -64,6 +63,13 @@ export const authOptions: NextAuthOptions = {
       }
       
       return token
+    },
+    redirect: ({url, baseUrl}) => {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
     }
   },
   providers: [
@@ -85,7 +91,7 @@ export const authOptions: NextAuthOptions = {
         }
       },
       async authorize(credentials) {
-        const res = await fetch(`${API_URL}/auth/login`, {
+        const res = await fetch(`${env.API_URL}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(credentials)
