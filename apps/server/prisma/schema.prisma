@@ -42,6 +42,7 @@ model Account {
   userId      Int
   name        String
   accountType AccountType
+  balance     Decimal
   note        String?
   iconPath    String?
   createdAt   DateTime  @default(now())
