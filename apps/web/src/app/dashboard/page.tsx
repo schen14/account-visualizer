@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Account } from "../_components/account";
+import { AccountItem } from "../_components/account";
+import Modal from "../_components/modal";
 
 export default function Dashboard() {
   const [ accounts, setAccounts] = useState<Account[]>([]);
   const [ activeAccount, setActiveAccount ] = useState<number>();
+  const [ showModal, setShowModal ] = useState<boolean>(false);
 
   const handleAccountClick = (id: number) => {
     setActiveAccount(id)
@@ -28,7 +30,12 @@ export default function Dashboard() {
           Accounts
         </h1>
         <div className="flex justify-center space-x-4 my-5">
-          <button className="flex-1 rounded-full bg-white/10 px-5 py-3 font-semibold transition hover:bg-white/20 border-2 hover:border-green-300">Add Account</button>
+          <button 
+            className="flex-1 rounded-full bg-white/10 px-5 py-3 font-semibold transition hover:bg-white/20 border-2 hover:border-green-300"
+            onClick={() => setShowModal(true)}
+          >
+            Add Account
+          </button>
           <button className="flex-1 rounded-full bg-white/10 px-5 py-3 font-semibold transition hover:bg-white/20 border-2 hover:border-green-300">Import</button>
         </div>
         
@@ -37,7 +44,7 @@ export default function Dashboard() {
           {
             accounts.length ? 
               accounts.map(account => (
-                <Account 
+                <AccountItem
                   key={account.id} 
                   account={account} 
                   isActiveAccount={activeAccount === account.id} 
@@ -48,6 +55,7 @@ export default function Dashboard() {
           }
         </div>
         
+        {showModal && <Modal onClose={() => setShowModal(false)} accounts={accounts} onAccountsChange={setAccounts} />}
     </section>
   )
 }

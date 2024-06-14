@@ -17,10 +17,7 @@ function formatAmount(balance: number) {
   })
 }
 
-export function Account({ account, isActiveAccount, onAccountClick }: Props) {
-
-
-
+export function AccountItem({ account, isActiveAccount, onAccountClick }: Props) {
   return (
     <div 
       className={`flex-col gap-4 rounded-xl my-5 transition ease-in-out cursor-pointer ${isActiveAccount ? 'bg-white text-gray-500' : 'bg-white/10 hover:bg-white hover:text-gray-500'}`}
