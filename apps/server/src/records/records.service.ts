@@ -2,10 +2,17 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { DatabaseService } from '../database/database.service';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class RecordsService {
   constructor(private readonly databaseService: DatabaseService) {}
+
+  @OnEvent('account.balanceUpdated')
+  notify({ accountId, balance }: {accountId: number, balance: number}) {
+    console.log('account.balanceUpdated event received')
+    this.create(accountId, { value: balance } as CreateRecordDto)
+  }
 
   async findAll(accountId: number) {
     return this.databaseService.record.findMany({
