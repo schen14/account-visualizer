@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, HttpStatus, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, HttpStatus, ParseIntPipe, UseInterceptors } from '@nestjs/common';
 import { RecordsService } from './records.service';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { JwtGuard } from '../auth/guard';
+import { DecimalInterceptor } from '../utils/decimal.interceptor';
 
 @UseGuards(JwtGuard)
+@UseInterceptors(DecimalInterceptor)
 @Controller('accounts/:accountId/records')
 export class RecordsController {
   constructor(private readonly recordsService: RecordsService) {}

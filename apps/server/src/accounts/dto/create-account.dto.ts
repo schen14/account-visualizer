@@ -1,3 +1,4 @@
+import { UnprocessableEntityException } from "@nestjs/common"
 import { AccountType } from "@prisma/client"
 import { Transform } from "class-transformer"
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
@@ -16,7 +17,7 @@ export class CreateAccountDto {
   @Transform(({ value }) => {
     const valueAsNum = Number(value);
     if (isNaN(valueAsNum)) {
-      throw new Error("balance must be a number conforming to the specified constraints");
+      throw new UnprocessableEntityException("balance must be a number conforming to the specified constraints");
     }
     return valueAsNum;
   })
