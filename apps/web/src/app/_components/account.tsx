@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Fragment, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import { AppProps } from "next/dist/shared/lib/router/router";
+import { ModalContext } from "./modalContext";
 
 interface Props {
   account: Account,
-  isActiveAccount: boolean,
   onAccountClick: () => void
 }
 
@@ -17,7 +17,10 @@ function formatAmount(balance: number) {
   })
 }
 
-export function AccountItem({ account, isActiveAccount, onAccountClick }: Props) {
+export function AccountItem({ account, onAccountClick }: Props) {
+  const modalContext = useContext(ModalContext);
+  const isActiveAccount = modalContext?.activeAccount?.id === account.id
+
   return (
     <div 
       className={`flex-col gap-4 rounded-xl my-5 transition ease-in-out cursor-pointer ${isActiveAccount ? 'bg-white text-gray-500' : 'bg-white/10 hover:bg-white hover:text-gray-500'}`}
@@ -32,8 +35,21 @@ export function AccountItem({ account, isActiveAccount, onAccountClick }: Props)
       {
         isActiveAccount &&
           <div className="flex bg-green-300 rounded-b-xl text-center">
-            <div className="w-1/2 border-r border-green-500 my-1 hover: bg-white/10">Update</div>
-            <div className="w-1/2 border-l border-green-500 my-1 hover: bg-white/10">More...</div>
+            <div 
+              className="w-1/2 border-r border-green-500 my-1 hover: bg-white/10"
+              onClick={() => {
+                console.log('test Update')
+                modalContext.setShowModal(true);
+              }}
+            >
+              Update
+            </div>
+            <div 
+              className="w-1/2 border-l border-green-500 my-1 hover: bg-white/10"
+              onClick={() => console.log('test More')}
+            >
+              More...
+            </div>
           </div>
       }
     </div>

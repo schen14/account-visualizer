@@ -15,7 +15,12 @@ export class AccountsService {
     return this.databaseService.account.findMany({
       where: {
         userId,
-      }
+      },
+      orderBy: [
+        {
+          createdAt: 'desc'
+        }
+      ]
     });
   }
 
