@@ -4,17 +4,12 @@ import { useRouter } from "next/navigation";
 import { Fragment, useContext, useState } from "react";
 import { AppProps } from "next/dist/shared/lib/router/router";
 import { ModalContext } from "./modalContext";
+import getFormattedAmount from "../../lib/getFormateedAmount";
+import Link from "next/link";
 
 interface Props {
   account: Account,
   onAccountClick: () => void
-}
-
-function formatAmount(balance: number) {
-  return balance.toLocaleString('en-US', {
-    'style': 'currency',
-    'currency': 'USD'
-  })
 }
 
 export function AccountItem({ account, onAccountClick }: Props) {
@@ -28,7 +23,7 @@ export function AccountItem({ account, onAccountClick }: Props) {
     >
       <h2 className="font-semibold px-4 pt-2">{account.name}</h2>
       <div className="flex-wrap px-4 py-2">
-        <p className="float-right">{formatAmount(account.balance)}</p> 
+        <p className="float-right">{getFormattedAmount(account.balance)}</p> 
         <p>{account.accountType}</p>
         
       </div>
@@ -44,12 +39,9 @@ export function AccountItem({ account, onAccountClick }: Props) {
             >
               Update
             </div>
-            <div 
-              className="w-1/2 border-l border-green-500 my-1 hover: bg-white/10"
-              onClick={() => console.log('test More')}
-            >
-              More...
-            </div>
+            <Link href={`/accounts/${account.id}`} className="w-1/2 border-l border-green-500 my-1 hover: bg-white/10">
+                More...
+            </Link>
           </div>
       }
     </div>
