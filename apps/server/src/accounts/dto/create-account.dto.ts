@@ -1,5 +1,4 @@
 import { UnprocessableEntityException } from "@nestjs/common"
-import { AccountType } from "@prisma/client"
 import { Transform } from "class-transformer"
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
@@ -8,9 +7,9 @@ export class CreateAccountDto {
   @IsNotEmpty()
   name: string
 
-  @IsEnum(AccountType)
+  @IsString()
   @IsNotEmpty()
-  accountType: AccountType
+  accountType: string
 
   @IsNumber({maxDecimalPlaces: 2})
   @IsNotEmpty()

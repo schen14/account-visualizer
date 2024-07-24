@@ -11,6 +11,8 @@ import { LoggerModule } from './logger/logger.module';
 import { DatabaseModule } from './database/database.module';
 import { LoggingInterceptor } from './logger/logger.interceptor';
 import { ConfigModule } from '@nestjs/config';
+import { PlaidModule } from './plaid/plaid.module';
+import { AppConfigModule } from './config/config.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    PlaidModule.forRootAsync(),
+    AppConfigModule,
   ],
   controllers: [AppController],
   providers: [

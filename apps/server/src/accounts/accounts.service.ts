@@ -99,4 +99,29 @@ export class AccountsService {
       }
     });
   }
+
+  async getAccountTypes() {
+    const defaultAccountTypes = [
+      'Checking',
+      'Savings',
+      'Retirement',
+      'Brokerage',
+      'Other'
+
+    ]
+    const distinctAccountTypes = await this.databaseService.account.findMany({
+      distinct: ['accountType'],
+      select: { accountType: true }
+    });
+    
+    const accountTypes = distinctAccountTypes.reduce((accTypes, a) => {
+      console.log(accTypes)
+      if (!defaultAccountTypes.includes(a.accountType)) {
+        accTypes.push(a.accountType);
+      }
+      return accTypes;
+    }, defaultAccountTypes);
+
+    return accountTypes;
+  }
 }

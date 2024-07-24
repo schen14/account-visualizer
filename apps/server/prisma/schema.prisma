@@ -23,6 +23,7 @@ model User {
   updatedAt DateTime  @updatedAt
   accounts  Account[]
   thirdPartyUsers ThirdPartyUser[]
+  plaidItems  UserPlaidItem[]
 
   // @@map("users")
 }
@@ -36,12 +37,22 @@ model ThirdPartyUser {
   @@id(name: "thirdPartyUserId", [externalId, provider])
 }
 
+model UserPlaidItem {
+  id          Int   @id @default(autoincrement())
+  user        User  @relation(fields: [userId], references: [id])
+  userId      Int
+  accessToken String
+  itemId      String
+
+  @@unique(name: "uniqueUserPlaidItem", [userId, itemId])
+}
+
 model Account {
   id          Int       @id @default(autoincrement())
   user        User      @relation(fields: [userId], references: [id])
   userId      Int
   name        String
-  accountType AccountType
+  accountType String
   balance     Decimal
   note        String?
   iconPath    String?
@@ -50,18 +61,9 @@ model Account {
   records     Record[]
 }
 
-enum AccountType {
-  CHECKING
-  SAVINGS
-  RETIREMENT
-  BROKERAGE
-  LIABILITY
-  OTHER
-}
-
 model Record {
   id        Int       @id @default(autoincrement())
-  account   Account   @relation(fields: [accountId], references: [id])
+  account   Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId Int
   value     Decimal
   createdAt DateTime  @default(now())

@@ -8,5 +8,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   imports: [DatabaseModule, EventEmitterModule.forRoot()],
   controllers: [AccountsController],
   providers: [AccountsService],
+  exports: [AccountsService],
 })
 export class AccountsModule {}

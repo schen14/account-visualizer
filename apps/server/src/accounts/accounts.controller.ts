@@ -17,6 +17,11 @@ export class AccountsController {
   findAll(@GetUser('id') userId: number) {
     return this.accountsService.findAll(userId);
   }
+  
+  @Get('types')
+  getAccountTypes() {
+    return this.accountsService.getAccountTypes();
+  }
 
   @Get(':id')
   findOne(@GetUser('id') userId: number, @Param('id', ParseIntPipe) accountId: number) {
