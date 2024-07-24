@@ -51,6 +51,7 @@ export class PlaidService {
     return response.data;
   }
   
+  // TODO: rename for more clarification
   async exchangePublicToken(userId: number, publicToken: string) {
     const response = await this.plaidClient.itemPublicTokenExchange({
       public_token: publicToken,

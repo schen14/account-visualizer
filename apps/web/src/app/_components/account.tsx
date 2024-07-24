@@ -33,14 +33,13 @@ export function AccountItem({ account, onAccountClick }: Props) {
             <div 
               className="w-1/2 border-r border-green-500 my-1 hover: bg-white/10"
               onClick={() => {
-                console.log('test Update')
                 modalContext.setShowModal(true);
               }}
             >
               Update
             </div>
             <Link href={`/accounts/${account.id}`} className="w-1/2 border-l border-green-500 my-1 hover: bg-white/10">
-                More...
+              More...
             </Link>
           </div>
       }

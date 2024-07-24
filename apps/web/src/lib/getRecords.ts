@@ -13,11 +13,8 @@ export default async function getRecords(accountId: string) {
     }
   })
 
-  if (!res.ok) throw new Error('faiiled to fetch account')
-  
-  // const record = await res.json();
+  if (!res.ok) throw new Error('faiiled to fetch records');
 
-  // return NextResponse.json(account);
 
   return res.json();
 }

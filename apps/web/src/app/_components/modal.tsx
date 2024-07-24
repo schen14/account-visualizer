@@ -1,19 +1,20 @@
-import { Dispatch, FormEvent, SetStateAction, useCallback, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useCallback, useEffect, useState } from "react";
 
 type Props = {
   activeAccount: Account | null,
   accounts: Account[],
+  accountTypes: string[],
   onAccountsChange: Dispatch<SetStateAction<Account[]>>,
   onClose: () => void,
 }
 
-export default function Modal({ activeAccount, accounts, onAccountsChange, onClose }: Props) {
+export default function Modal({ activeAccount, accounts, accountTypes, onAccountsChange, onClose }: Props) {
   const [ isLoading, setIsLoading ] = useState<boolean>(false);
   const [ error, setError ] = useState<string | null>(null);
 
   const accFormProps = activeAccount ? {
     name: { disabled: true, defaultValue: activeAccount.name },
-    type: { disabled: true },
+    type: { disabled: true, defaultValue: activeAccount.accountType },
     balance: { defaultValue: activeAccount.balance },
     note: { defaultValue: activeAccount.note }
   } : {}
@@ -63,24 +64,13 @@ export default function Modal({ activeAccount, accounts, onAccountsChange, onClo
     if (activeAccount) {
       // update active account in place
       onAccountsChange(accounts.map(a => {
-        if (a.id === activeAccount.id) {
-          console.log('a: ', a)
-          console.log('accountData: ', accountData)
-          console.log('new: ', { ...a, ...accountData})
-        }
         return a.id === activeAccount.id ? { ...a, ...accountData } : a
       }))
     } else {
       // add new account to the end of the list
       onAccountsChange([...accounts, accountData])
     }    
-  }, [onAccountsChange])
-
-  const accountTypes = [
-    "CHECKING",
-    "SAVINGS"
-  ]
-  
+  }, [onAccountsChange])  
 
   return (
     <>
@@ -96,7 +86,7 @@ export default function Modal({ activeAccount, accounts, onAccountsChange, onClo
               <select className="border-2 border-gray-500 rounded-md disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200" name="accountType" required { ...accFormProps.type }>
                 {
                   accountTypes.map((type) => (
-                    <option key={`${type}`} value={`${type}`} selected={ type === activeAccount?.accountType }>{type}</option>
+                    <option key={`${type}`} value={`${type}`}>{type}</option>
                   ))
                 }
               </select>
