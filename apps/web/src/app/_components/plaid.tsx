@@ -1,9 +1,13 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { usePlaidLink } from 'react-plaid-link';
 
-export function Plaid() {
+type Props = {
+  onAccountsChange: (accountsData: Account[]) => void,
+}
+
+export function Plaid({ onAccountsChange }: Props) {
   const [linkToken, setLinkToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,15 +28,15 @@ export function Plaid() {
       method: 'POST',
       body: JSON.stringify({ publicToken }),
     });
-    const data = await response.json();
-    console.log('onSuccess data', data)
+    const accountsData = await response.json();
+    // update accounts list
+    onAccountsChange(accountsData);
   }
 
   const { open, ready } = usePlaidLink({
     token: linkToken!,
     onSuccess,
   });
-
 
   return (
     <button 

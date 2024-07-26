@@ -1,14 +1,13 @@
-import { Dispatch, FormEvent, SetStateAction, useCallback, useEffect, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useCallback, useState } from "react";
 
 type Props = {
   activeAccount: Account | null,
-  accounts: Account[],
   accountTypes: string[],
-  onAccountsChange: Dispatch<SetStateAction<Account[]>>,
+  onAccountsChange: (accountsData: Account[]) => void,
   onClose: () => void,
 }
 
-export default function Modal({ activeAccount, accounts, accountTypes, onAccountsChange, onClose }: Props) {
+export default function Modal({ activeAccount, accountTypes, onAccountsChange, onClose }: Props) {
   const [ isLoading, setIsLoading ] = useState<boolean>(false);
   const [ error, setError ] = useState<string | null>(null);
 
@@ -34,7 +33,7 @@ export default function Modal({ activeAccount, accounts, accountTypes, onAccount
       }
       
       const accountData = await res.json();
-      handleAccountsChange(accountData);
+      onAccountsChange([accountData]);
       onClose();
     } catch (error: any) {
       setError(error.message);
@@ -59,18 +58,6 @@ export default function Modal({ activeAccount, accounts, accountTypes, onAccount
       body: formData,
     });
   }
-
-  const handleAccountsChange = useCallback((accountData: Account) => {
-    if (activeAccount) {
-      // update active account in place
-      onAccountsChange(accounts.map(a => {
-        return a.id === activeAccount.id ? { ...a, ...accountData } : a
-      }))
-    } else {
-      // add new account to the end of the list
-      onAccountsChange([...accounts, accountData])
-    }    
-  }, [onAccountsChange])  
 
   return (
     <>

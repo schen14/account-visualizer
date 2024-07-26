@@ -26,6 +26,23 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  const handleAccountsChange = (accountsData: Account[]) => {
+    if (activeAccount) {
+      // update active account in place (accountsData should be size 1)
+      setAccounts(accounts.map(a => {
+        return a.id === activeAccount.id ? { ...a, ...accountsData[0] } : a
+      }))
+    } else {
+      // add new account(s) to the top of the list
+      setAccounts([...accountsData, ...accounts])
+    }    
+  }
+
+  const handleClose = () => {
+    setShowModal(false);
+    setActiveAccount(null);
+  }
+
 
   return (
     <section>
@@ -42,8 +59,7 @@ export default function Dashboard() {
           >
             Add Account
           </button>
-          {/* <button className="flex-1 rounded-full bg-white/10 px-5 py-3 font-semibold transition hover:bg-white/20 border-2 hover:border-green-300">Import</button> */}
-          <Plaid></Plaid>
+          <Plaid onAccountsChange={handleAccountsChange}></Plaid>
         </div>
         
         {/* AccountGroup? */}
@@ -63,7 +79,7 @@ export default function Dashboard() {
           </ModalContext.Provider>
         </div>
         
-        {showModal && <Modal activeAccount={activeAccount} accounts={accounts} accountTypes={accountTypes} onAccountsChange={setAccounts} onClose={() => setShowModal(false)}/>}
+        {showModal && <Modal activeAccount={activeAccount} accountTypes={accountTypes} onAccountsChange={handleAccountsChange} onClose={handleClose}/>}
     </section>
   )
 }

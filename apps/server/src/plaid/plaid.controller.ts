@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PlaidService } from './plaid.service';
 import { CreateUserPlaidItemDto, UpdateUserPlaidItemDto } from './dto/';
 import { GetUser } from '../auth/decorator';
 import { User } from '@prisma/client';
 import { JwtGuard } from '../auth/guard';
+import { AccountsService } from '../accounts/accounts.service';
+import { DecimalInterceptor } from '../utils/decimal.interceptor';
 
 @UseGuards(JwtGuard)
+@UseInterceptors(DecimalInterceptor)
 @Controller('plaid')
 export class PlaidController {
   constructor(private readonly plaidService: PlaidService) {}

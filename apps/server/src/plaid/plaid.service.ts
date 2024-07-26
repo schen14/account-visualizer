@@ -64,9 +64,9 @@ export class PlaidService {
 
     await this.createUserPlaidItem(userId, dto)
 
-    await this.importPlaidAccounts(userId, response.data.access_token)
+    const accountsData = await this.importPlaidAccounts(userId, response.data.access_token)
 
-    return response.data;
+    return accountsData;
   }
 
   async deleteCurrentAccessToken(accessToken: string) {
@@ -207,7 +207,7 @@ export class PlaidService {
     const transformedAccount: CreateAccountDto = {
       name: account.name || account.official_name,
       accountType,
-      balance: account.balances.current || account.balances.available,
+      balance: Number(account.balances.current || account.balances.available),
       note: 'Imported from Plaid',
     };
     return transformedAccount;
@@ -225,17 +225,10 @@ export class PlaidService {
 
     const accounts = await Promise.all(createAccountPromises);
     console.log('inserted Plaid accounts', accounts);
+    console.log('typeof balance:', typeof accounts[0].balance)
     return accounts;
 
   }
-
-  // async importPlaidAccount(userId: number, publicToken: string) {
-  //   // access token
-  //   this.exchangePublicToken(userId, publicToken);
-  //   // get plaid account
-  //   this.getAccounts();
-  //   // create account
-  // }
 
   // async getAccountTransactions(accessToken: string, startDate: string, endDate: string, accountId: string) {
   //   const transactionOptions = { account_ids: [accountId] };
