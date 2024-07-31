@@ -74,7 +74,7 @@ export default function Dashboard() {
                     onAccountClick={() => setActiveAccount(account)}
                   />
                 )) :
-                "Loading..."
+                <p className="flex justify-center">There are no accounts to display.</p>
             }
           </ModalContext.Provider>
         </div>

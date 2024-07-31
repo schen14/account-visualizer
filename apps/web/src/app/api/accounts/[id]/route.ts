@@ -23,3 +23,20 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
   return NextResponse.json(account);
 }
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } } ) {
+  const session = await getServerAuthSession();
+
+  const res = await fetch(`${env.API_URL}/accounts/${params.id}`, {
+    method: "DELETE",
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session?.user.api_access_token}`
+    },
+  })
+
+  if (!res.ok) throw new Error('failed to delete data')
+
+  const deleteRes = await res.text();
+  return new NextResponse(deleteRes);
+}

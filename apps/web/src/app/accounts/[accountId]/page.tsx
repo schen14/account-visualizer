@@ -4,13 +4,13 @@ import { getServerAuthSession } from "~/server/auth";
 import getAccount from "../../../lib/getAccount";
 import getRecords from "../../../lib/getRecords";
 import getFormattedAmount from "../../../lib/getFormateedAmount";
+import DeleteAccountButton from "../../_components/delete-account-button";
 
 type Props = {
   params: {
     accountId: string
   }
 }
-
 
 export default async function Account({ params: { accountId } }: Props) {
   //const session = await getServerAuthSession();
@@ -26,10 +26,11 @@ export default async function Account({ params: { accountId } }: Props) {
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           {account.name}
         </h1>
+        <p className="text-5xl tracking-tight sm:text-[5rem]">Back</p>
       </div>
       <div className="flex justify-center space-x-4 my-5 text-gray-500 items-stretch flex-grow">
         <div className="w-1/3 bg-white m-auto p-8 rounded-xl h-full">
-          <div className="flex flex-col">
+          <div className="flex flex-col h-full">
             <h2 className="text-2xl">Details</h2>
             <hr className="h-1 bg-gray-300"></hr>
             <br/>
@@ -39,6 +40,7 @@ export default async function Account({ params: { accountId } }: Props) {
             <span><b>Created:</b> {new Date(account.createdAt).toLocaleString()}</span>
             <span><b>Updated:</b> {new Date(account.updatedAt).toLocaleString()}</span>
             <span><b>Link:</b> <a href="https://www.chase.com" target="_blank" rel="noreferrer noopener" className="text-blue-400 dark:text-blue-300 hover:underline">Chase</a></span>
+            <DeleteAccountButton accountId={accountId}></DeleteAccountButton>
           </div>
         </div>
         <div className="w-2/3 bg-white m-auto p-8 rounded-xl h-full">
