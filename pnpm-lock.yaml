@@ -37,9 +37,6 @@ importers:
       '@prisma/client':
         specifier: ^5.12.1
         version: 5.14.0(prisma@5.14.0)
-      '@trpc/server':
-        specifier: 11.0.0-rc.377
-        version: 11.0.0-rc.377
       argon2:
         specifier: ^0.40.1
         version: 0.40.1
@@ -67,18 +64,12 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.1
-      stripe:
-        specifier: ^15.5.0
-        version: 15.8.0
       winston:
         specifier: ^3.13.0
         version: 3.13.0
       winston-daily-rotate-file:
         specifier: ^5.0.0
         version: 5.0.0(winston@3.13.0)
-      zod:
-        specifier: ^3.23.3
-        version: 3.23.8
     devDependencies:
       '@nestjs/cli':
         specifier: ^10.0.0
@@ -1958,9 +1949,6 @@ packages:
 
   '@trpc/server@11.0.0-rc.374':
     resolution: {integrity: sha512-7r76KJwbSV5mffEYQMGBIAVrrJdPot0JzYQD9ZvcInO8q9sn+uVVZQ8XCAq93zXDSodvzGBJhRu3Kn1qXPw5Xg==}
-
-  '@trpc/server@11.0.0-rc.377':
-    resolution: {integrity: sha512-Fzgvf6N03mZRA9F2uR8S20a36ferWD28uJ4OSP1Es+iEGGnvxmoLm31ECIDJcp7qffR/zEA1CLiKgylLaR4z8w==}
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -4975,10 +4963,6 @@ packages:
   strip-json-comments@3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
-
-  stripe@15.8.0:
-    resolution: {integrity: sha512-7eEPMgehd1I16cXeP7Rcn/JKkPWIadB9vGIeE+vbCzQXaY5R95AoNmkZx0vmlu1H4QIDs7j1pYIKPRm9Dr4LKg==}
-    engines: {node: '>=12.*'}
 
   styled-jsx@5.1.1:
     resolution: {integrity: sha512-pW7uC1l4mBZ8ugbiZrcIsiIvVx1UmTfw7UkC3Um2tmfUq9Bhk8IiyEIPl6F8agHgjzku6j0xQEZbfA5uSgSaCw==}
@@ -8206,8 +8190,6 @@ snapshots:
       react-dom: 18.2.0(react@18.2.0)
 
   '@trpc/server@11.0.0-rc.374': {}
-
-  '@trpc/server@11.0.0-rc.377': {}
 
   '@tsconfig/node10@1.0.11': {}
 
@@ -11691,11 +11673,6 @@ snapshots:
   strip-final-newline@2.0.0: {}
 
   strip-json-comments@3.1.1: {}
-
-  stripe@15.8.0:
-    dependencies:
-      '@types/node': 20.12.12
-      qs: 6.12.1
 
   styled-jsx@5.1.1(react@18.2.0):
     dependencies:
