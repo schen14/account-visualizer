@@ -4,7 +4,6 @@ import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { JwtGuard } from '../auth/guard';
 import { GetUser } from '../auth/decorator';
-import { User } from '@prisma/client';
 import { DecimalInterceptor } from '../utils/decimal.interceptor';
 
 @UseGuards(JwtGuard)

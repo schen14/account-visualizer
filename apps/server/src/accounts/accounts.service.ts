@@ -114,8 +114,7 @@ export class AccountsService {
       select: { accountType: true }
     });
     
-    const accountTypes = distinctAccountTypes.reduce((accTypes, a) => {
-      console.log(accTypes)
+    const accountTypes = distinctAccountTypes.reduce((accTypes: string[], a: { accountType: string }) => {
       if (!defaultAccountTypes.includes(a.accountType)) {
         accTypes.push(a.accountType);
       }
