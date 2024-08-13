@@ -1,23 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+import { NextResponse } from "next/server";
 import { getServerAuthSession } from "../../../server/auth";
 import { env } from "~/env";
+import { isAccount, isAccountArray } from "../../../lib/types";
+import { fetchJson } from "../../../lib/fetchJson";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const session = await getServerAuthSession();
-
-  const res = await fetch(`${env.API_URL}/accounts`, {
+  
+  const urlInput = `${env.API_URL}/accounts`;
+  const init = {
     method: "GET",
     headers: { 
       "Content-Type": "application/json",
       "Authorization": `Bearer ${session?.user.api_access_token}`
     }
-  })
+  }
+  const errorMessage = 'Failed to fetch data';
 
-  if (!res.ok) throw new Error('faiiled to fetch data')
-  
-  const accounts = await res.json();
+  const accounts = await fetchJson<Account[]>(urlInput, init, errorMessage);
 
-  return NextResponse.json(accounts);
+  if (Array.isArray(accounts) && isAccountArray(accounts)) {
+    return NextResponse.json(accounts);    
+  } else {
+    throw new Error('Invalid response format');
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -26,18 +34,22 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const bodyData = Object.fromEntries(formData)
 
-  const res = await fetch(`${env.API_URL}/accounts`, {
+  const urlInput = `${env.API_URL}/accounts`;
+  const init = {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
       "Authorization": `Bearer ${session?.user.api_access_token}`
     },
     body: JSON.stringify(bodyData),
-  })
+  }
+  const errorMessage = 'Failed to create data';
 
-  if (!res.ok) throw new Error('failed to create data')
+  const account = await fetchJson<Account>(urlInput, init, errorMessage);
 
-  const account = await res.json();
-
-  return NextResponse.json(account);
+  if (isAccount(account)) {
+    return NextResponse.json(account);    
+  } else {
+    throw new Error('Invalid response format');
+  }
 }

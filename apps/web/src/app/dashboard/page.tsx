@@ -5,6 +5,7 @@ import { AccountItem } from "../_components/account";
 import Modal from "../_components/modal";
 import { ModalContext } from "../_components/modalContext";
 import { Plaid } from "../_components/plaid";
+import { fetchJson } from "../../lib/fetchJson";
 
 export default function Dashboard() {
   const [ accounts, setAccounts] = useState<Account[]>([]);
@@ -14,16 +15,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-        const fetchAccounts = fetch('api/accounts');
-        const fetchAccountTypes = fetch('api/accounts/types');
-        const results = await Promise.all([fetchAccounts, fetchAccountTypes]);
-        const accountsData = await results[0].json();
-        const accountTypesData = await results[1].json();
+      try {
+        const fetchAccounts = () => fetchJson<Account[]>('api/accounts');
+        const fetchAccountTypes = () => fetchJson<string[]>('api/accounts/types');
+        const results = await Promise.all([fetchAccounts(), fetchAccountTypes()]);
+        const [accountsData, accountTypesData] = results;
+        
         setAccounts(accountsData);
         setAccountTypes(accountTypesData);
+      } catch (error) {
+        if (typeof error === 'string') {
+          throw new Error(error);
+        }
+        console.log(error);
+      }
     };
 
-    fetchData();
+    void fetchData();
   }, []);
 
   const handleAccountsChange = (accountsData: Account[]) => {

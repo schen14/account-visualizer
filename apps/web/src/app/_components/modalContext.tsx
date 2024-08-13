@@ -1,6 +1,5 @@
-import { SetStateAction, createContext } from "react";
-
-type Dispatch<A> = (value: A) => void;
+import type { Dispatch, SetStateAction } from "react";
+import { createContext } from "react";
 
 interface IContextProps {
   activeAccount: Account | null;

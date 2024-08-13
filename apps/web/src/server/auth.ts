@@ -1,3 +1,4 @@
+import type { User } from "next-auth";
 import {
   getServerSession,
   type DefaultSession,
@@ -5,8 +6,10 @@ import {
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { jwtDecode } from "jwt-decode";
 
 import { env } from "~/env";
+import { fetchJson } from "../lib/fetchJson";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -48,7 +51,7 @@ export const authOptions: NextAuthOptions = {
     }),
     jwt: async ({ token, account }) => {
       if (account) {
-        const res = await fetch(`${env.API_URL}/auth/verify`, {
+        const apiJwt = await fetchJson<object>(`${env.API_URL}/auth/verify`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -56,9 +59,8 @@ export const authOptions: NextAuthOptions = {
             provider: account.provider
           })
         })
-        const apiJwt = await res.json()
         console.log(apiJwt)
-        if (res.ok && apiJwt) {
+        if (typeof apiJwt === 'object' && 'access_token' in apiJwt) {
           token.api_access_token = apiJwt.access_token
         }
       }
@@ -93,16 +95,18 @@ export const authOptions: NextAuthOptions = {
         }
       },
       async authorize(credentials) {
-        const res = await fetch(`${env.API_URL}/auth/login`, {
+        const jwtToken = await fetchJson<string>(`${env.API_URL}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(credentials)
         })
-
-        const jwtToken = await res.json()
-
-        if (res.ok && jwtToken) {
-          return jwtToken
+        console.log('jwtToken: ', jwtToken)
+        if (jwtToken) {
+          const decoded = jwtDecode(jwtToken)
+          const user: User = {
+            id: decoded.sub!
+          };
+          return user
         }
 
         return null

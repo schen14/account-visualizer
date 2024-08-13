@@ -1,20 +1,15 @@
 import { env } from "process";
 import { getServerAuthSession } from "../server/auth";
-import { NextResponse } from "next/server";
+import { fetchJson } from "./fetchJson";
 
-export default async function getRecords(accountId: string) {
+export default async function getRecords(accountId: string): Promise<AccRecord[]> {
   const session = await getServerAuthSession();
 
-  const res = await fetch(`${env.API_URL}/accounts/${accountId}/records`, {
+  return fetchJson<AccRecord[]>(`${env.API_URL}/accounts/${accountId}/records`, {
     method: "GET",
     headers: { 
       "Content-Type": "application/json",
       "Authorization": `Bearer ${session?.user.api_access_token}`
     }
-  })
-
-  if (!res.ok) throw new Error('faiiled to fetch records');
-
-
-  return res.json();
+  }, 'Failed to fetch records');
 }

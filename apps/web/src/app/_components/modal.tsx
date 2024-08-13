@@ -1,4 +1,6 @@
-import { Dispatch, FormEvent, SetStateAction, useCallback, useState } from "react";
+import type { FormEvent } from "react";
+import { useState } from "react";
+import { fetchJson } from "../../lib/fetchJson";
 
 type Props = {
   activeAccount: Account | null,
@@ -26,37 +28,35 @@ export default function Modal({ activeAccount, accountTypes, onAccountsChange, o
 
     try {
       const formData = new FormData(event.currentTarget);
-      const res = activeAccount ? await updateAccount(formData) : await createAccount(formData);
-
-      if (!res.ok) {
-        throw new Error('Failed to submit the data. Please try again.')
-      }
-      
-      const accountData = await res.json();
+      const accountData: Account = activeAccount ? await updateAccount(formData) : await createAccount(formData);
+  
       onAccountsChange([accountData]);
       onClose();
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+        setError(error.message);
+      }
+      
     } finally {
       setIsLoading(false);
     }
   };
 
   const createAccount = async (formData: FormData) => {
-    return await fetch("api/accounts", {
+    return await fetchJson<Account>("api/accounts", {
       method: "POST",
       body: formData,
-    });
+    }, 'Failed to create the data');
   }
 
   const updateAccount = async (formData: FormData) => {
     if (activeAccount?.balance.toString() === formData.get('balance')) {
       formData.delete('balance');
     }
-    return await fetch(`/api/accounts/${activeAccount?.id}`, {
+    return await fetchJson<Account>(`/api/accounts/${activeAccount?.id}`, {
       method: "PATCH",
       body: formData,
-    });
+    }, 'Failed to update the data');
   }
 
   return (
@@ -66,6 +66,7 @@ export default function Modal({ activeAccount, accountTypes, onAccountsChange, o
           <div className="flex flex-col items-center">
             <h3 className="text-xl">{activeAccount ? "Update Account" : "Add New Account"}</h3>
             <br/>
+            {error && <p>error</p>}
             <form className="flex flex-col" onSubmit={handleSubmit}>
               <label htmlFor="name" className="">Name:*</label>
               <input className="border-2 border-gray-500 rounded-md disabled:bg-slate-50 disabled:text-slate-400 disabled:border-slate-200" type="text" name="name" required { ...accFormProps.name }/>

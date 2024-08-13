@@ -1,8 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Fragment, useContext, useState } from "react";
-import { AppProps } from "next/dist/shared/lib/router/router";
+import { useContext } from "react";
 import { ModalContext } from "./modalContext";
 import getFormattedAmount from "../../lib/getFormateedAmount";
 import Link from "next/link";
